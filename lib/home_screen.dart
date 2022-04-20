@@ -10,9 +10,11 @@ class HomeScreen extends StatelessWidget {
         title: Text('Home Screen'),
       ),
       body: Center(
-          child: Text(
-        'Hello world!',
-      )),
+        child: Text(
+          'Hello World',
+          style: TextStyle(fontSize: 35),
+        ),
+      ),
     );
   }
 }
