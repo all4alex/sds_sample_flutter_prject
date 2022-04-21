@@ -10,6 +10,7 @@ abstract class ListState extends Equatable {
 
 class InitialState extends ListState {}
 
+//student list states
 class LoadingListState extends ListState {}
 
 class SuccessListState extends ListState {
@@ -17,4 +18,13 @@ class SuccessListState extends ListState {
   final List<StudentResponse> studentList;
 }
 
+//add student states
 class FailedListState extends ListState {}
+
+class AddStudentLoadingState extends ListState {}
+
+class AddStudentSuccessState extends ListState {
+  AddStudentSuccessState();
+}
+
+class AddStudentFailedState extends ListState {}

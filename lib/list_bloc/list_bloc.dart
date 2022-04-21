@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sds_sample_flutter_prject/api/api_service.dart';
 import 'package:sds_sample_flutter_prject/list_bloc/list_state.dart';
+import 'package:sds_sample_flutter_prject/models/student_data.dart';
 import 'package:sds_sample_flutter_prject/models/student_model.dart';
 
 class ListBloc extends Cubit<ListState> {
@@ -23,7 +24,16 @@ class ListBloc extends Cubit<ListState> {
     emit(LoadingListState());
 
     List<StudentResponse> studentList = await _apiService.getStudentList();
-
     emit(SuccessListState(studentList: studentList));
+  }
+
+  void addStudent({required StudentData studentData}) async {
+    emit(AddStudentLoadingState());
+    bool success = await _apiService.addStudent(studentData: studentData);
+    if (success) {
+      emit(AddStudentSuccessState());
+    } else {
+      emit(AddStudentFailedState());
+    }
   }
 }
