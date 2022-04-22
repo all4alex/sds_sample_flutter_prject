@@ -3,6 +3,7 @@ import 'package:sds_sample_flutter_prject/api/api_service.dart';
 import 'package:sds_sample_flutter_prject/list_bloc/list_state.dart';
 import 'package:sds_sample_flutter_prject/models/student_data.dart';
 import 'package:sds_sample_flutter_prject/models/student_model.dart';
+import 'package:sds_sample_flutter_prject/models/update_student_data.dart';
 
 class ListBloc extends Cubit<ListState> {
   ListBloc() : super(InitialState());
@@ -22,9 +23,15 @@ class ListBloc extends Cubit<ListState> {
 
   void getStudentList() async {
     emit(LoadingListState());
+    List<StudentResponse> activeStudentList = [];
 
     List<StudentResponse> studentList = await _apiService.getStudentList();
-    emit(SuccessListState(studentList: studentList));
+    for (StudentResponse student in studentList) {
+      if (student.isActive!) {
+        activeStudentList.add(student);
+      }
+    }
+    emit(SuccessListState(studentList: activeStudentList));
   }
 
   void addStudent({required StudentData studentData}) async {
@@ -34,6 +41,29 @@ class ListBloc extends Cubit<ListState> {
       emit(AddStudentSuccessState());
     } else {
       emit(AddStudentFailedState());
+    }
+  }
+
+  void updateStudent(
+      {required UpdateStudentData updateStudentData,
+      required String id}) async {
+    emit(UpdateStudentLoadingState());
+    bool success = await _apiService.updateStudent(
+        updateStudentData: updateStudentData, id: id);
+    if (success) {
+      emit(UpdateStudentSuccessState());
+    } else {
+      emit(UpdateStudentFailedState());
+    }
+  }
+
+  void deleteStudent({required String id}) async {
+    emit(UpdateStudentLoadingState());
+    bool success = await _apiService.deleteStudent(isActive: false, id: id);
+    if (success) {
+      emit(UpdateStudentSuccessState());
+    } else {
+      emit(UpdateStudentFailedState());
     }
   }
 }

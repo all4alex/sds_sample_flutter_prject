@@ -4,7 +4,10 @@ import 'package:sds_sample_flutter_prject/list_bloc/list_bloc.dart';
 import 'package:sds_sample_flutter_prject/list_bloc/list_state.dart';
 import 'package:sds_sample_flutter_prject/models/student_data.dart';
 import 'package:sds_sample_flutter_prject/models/student_model.dart';
+import 'package:sds_sample_flutter_prject/models/update_student_data.dart';
 import 'package:sds_sample_flutter_prject/presentation/add_student_screen.dart';
+import 'package:sds_sample_flutter_prject/presentation/update_student_screen.dart';
+import 'package:sds_sample_flutter_prject/presentation/view_student_screen.dart';
 
 class ListScreen extends StatefulWidget {
   ListScreen({Key? key}) : super(key: key);
@@ -15,10 +18,12 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   List<StudentResponse> studentList = [];
+  late ListBloc listBloc;
 
   @override
   void initState() {
-    context.read<ListBloc>().getStudentList();
+    listBloc = BlocProvider.of<ListBloc>(context);
+    listBloc.getStudentList();
     super.initState();
   }
 
@@ -30,8 +35,9 @@ class _ListScreenState extends State<ListScreen> {
       ),
       body: BlocListener<ListBloc, ListState>(
         listener: (context, state) {
-          if (state is AddStudentSuccessState) {
-            context.read<ListBloc>().getStudentList();
+          if (state is AddStudentSuccessState ||
+              state is UpdateStudentSuccessState) {
+            listBloc.getStudentList();
           }
         },
         child: BlocBuilder<ListBloc, ListState>(
@@ -57,9 +63,68 @@ class _ListScreenState extends State<ListScreen> {
                         height: 30,
                         child: InkWell(
                           onTap: () {
-                            print('ITEM: $index');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ViewStudentScreen(
+                                        studentResponse: studentList[index],
+                                      )),
+                            );
                           },
-                          child: Text('${studentList[index].firstname}'),
+                          child: ListTile(
+                            title: Text('${studentList[index].firstname}'),
+                            trailing: Container(
+                              width: 100,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 30,
+                                    width: 30,
+                                    child: IconButton(
+                                        onPressed: () async {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UpdateStudentScreen(
+                                                      studentResponse:
+                                                          studentList[index],
+                                                      onUpdateBtnClicked:
+                                                          (UpdateStudentData
+                                                                  updateStudentData,
+                                                              String id) {
+                                                        Navigator.of(context)
+                                                            .pop();
+
+                                                        listBloc.updateStudent(
+                                                            updateStudentData:
+                                                                updateStudentData,
+                                                            id: id);
+                                                      },
+                                                    )),
+                                          );
+                                        },
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.blue,
+                                        )),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        listBloc.deleteStudent(
+                                            id: studentList[index]
+                                                .id
+                                                .toString());
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -79,15 +144,10 @@ class _ListScreenState extends State<ListScreen> {
             MaterialPageRoute(builder: (context) => const AddStudentScreen()),
           );
           print(studentData.toJson().toString());
-          context.read<ListBloc>().addStudent(studentData: studentData);
+          listBloc.addStudent(studentData: studentData);
         },
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  Future _refreshData() async {
-    await Future.delayed(Duration(seconds: 3));
-    setState(() {});
   }
 }

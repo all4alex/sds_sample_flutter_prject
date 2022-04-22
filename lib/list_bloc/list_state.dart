@@ -18,9 +18,9 @@ class SuccessListState extends ListState {
   final List<StudentResponse> studentList;
 }
 
-//add student states
 class FailedListState extends ListState {}
 
+//add student states
 class AddStudentLoadingState extends ListState {}
 
 class AddStudentSuccessState extends ListState {
@@ -28,3 +28,12 @@ class AddStudentSuccessState extends ListState {
 }
 
 class AddStudentFailedState extends ListState {}
+
+//update student states
+class UpdateStudentLoadingState extends ListState {}
+
+class UpdateStudentSuccessState extends ListState {
+  UpdateStudentSuccessState();
+}
+
+class UpdateStudentFailedState extends ListState {}
