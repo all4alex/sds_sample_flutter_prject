@@ -1,4 +1,4 @@
-# sds_sample_flutter_prject
+# FLUTTER SAMPLE PROJECT
 
 A new Flutter project.
 
